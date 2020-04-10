@@ -1,5 +1,5 @@
 <template>
-    <div id="Login">
+    <div class="Login">
         <div  class="LoginBox">
             <div class="LoginImg"><img src="../assets/logo.png"></div>
             
@@ -58,15 +58,16 @@ export default {
                 if(!valid) return;
                 //接受api接口返回得数据
                 const { data : res}=await this.$http.post("login",this.ruleForm);
+                console.log(res)
                  //判断返回的数据状态，如果不是200登陆失败
                 if(res.meta.status !== 200) return this.$message.error("登录失败");
                 this.$message.success("登录成功");
                 //登录成功跳转到首页
-                
+              
                 //将登录成功之后的token值保存到sessionStorage中
                 window.sessionStorage.setItem("token",res.data.token);
                 //编程式导航执行跳转到首页
-                this.$router.push("/Home");
+                this.$router.push("/home");
              
 
             }
@@ -84,13 +85,9 @@ export default {
 }
 </script>
 <style lang="less" scoped>
-#Login{
-    background-color:#409EFF;
-    height: 100%;
-    width: 100%;
-    position:absolute;
-    left: 0;
-    top: 0;
+.Login{height: 100%;background: #66B1FF;}
+  
+ 
   .LoginBox{
       width: 550px;
       height: 400px;
@@ -134,5 +131,5 @@ export default {
       justify-content: flex-end;
   }
 
-}
+
 </style>

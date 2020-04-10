@@ -1,12 +1,18 @@
 <template>
-  <div id="app">
-    <!--占位符-->
-    <router-view></router-view>
-  </div>
+
+        
+       <h3>Welcome</h3>
+        
+
 </template>
 <script>
 export default {
-  
+    data(){
+        return{
+
+        }
+    }
+    
 }
 </script>
 <style lang="less" scoped>
