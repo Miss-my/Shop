@@ -8,7 +8,7 @@
     <el-aside :width="Iscollapse?'64px':'200px'" class="Homeleft">
         <div class="taggle-btns" @click="TaggleCollapse">|||</div>
         <el-menu class="el-menu-vertical-demo" background-color="#313743" active-text-color="#66B1FF" text-color="#fff" unique-opened :collapse="Iscollapse" 
-         :collapse-transition="false" router>
+         :collapse-transition="false" router :default-active="ActivePath">
 
         <el-submenu :index="menulist.id+''" v-for="menulist in menulists" :key="menulist.key" >  
             <template slot="title">
@@ -16,7 +16,7 @@
             <span>{{menulist.authName}}</span>
             </template>
 
-                <el-menu-item :index="'/'+subitem.path"   v-for="subitem in menulist.children" :key="subitem.id" >
+                <el-menu-item :index="'/'+subitem.path"   v-for="subitem in menulist.children" :key="subitem.id" @click="SaveNavStatus('/'+subitem.path)">
                     <template slot="title" >
                         <i class="el-icon-menu"></i>
                         <span>{{subitem.authName}}</span>
@@ -53,13 +53,15 @@ export default {
              '145':'iconfont icon-tongji'
              
          },
-        Iscollapse:false
+        Iscollapse:false,
+        ActivePath:"",
          
 
         }
     },
     created(){
         this.GetMenuList();
+        this.ActivePath=window.sessionStorage.getItem('ActivePath');
         
     },
     methods:{
@@ -74,7 +76,7 @@ export default {
       
         if(res.meta.status!==200) return this.$message.error(res.meta.msg);
         this.menulists=res.data;
-         console.log(res);
+     
 
         },
 
@@ -82,6 +84,13 @@ export default {
          this.Iscollapse=!this.Iscollapse;
           
            
+        },
+        //保存菜单列表激活时的状态
+        SaveNavStatus(ActivePath){
+            //把获取的链接地址保存到sessionStorage里面
+            window.sessionStorage.setItem("ActivePath",ActivePath);
+            this.ActivePath=ActivePath;
+
         }
 
 

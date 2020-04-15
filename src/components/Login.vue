@@ -58,7 +58,7 @@ export default {
                 if(!valid) return;
                 //接受api接口返回得数据
                 const { data : res}=await this.$http.post("login",this.ruleForm);
-                console.log(res)
+              
                  //判断返回的数据状态，如果不是200登陆失败
                 if(res.meta.status !== 200) return this.$message.error("登录失败");
                 this.$message.success("登录成功");
