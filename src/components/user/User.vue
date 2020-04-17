@@ -41,7 +41,7 @@
                         <el-button type="primary" icon="el-icon-edit" size="small" @click="ShowEditdialog(scope.row.id)"></el-button>
                         <el-button type="danger" icon="el-icon-delete" size="small"  @click="DeleteUser(scope.row.id)"></el-button>
                         <el-tooltip  content="角色分配" placement="top" :enterable="false">
-                        <el-button type="warning" icon="el-icon-setting" size="small"></el-button>
+                        <el-button type="warning" icon="el-icon-setting" size="small" @click="ResetRoles(scope.row)"></el-button>
                         </el-tooltip>
                     
                         
@@ -108,6 +108,31 @@
             <el-button type="primary" @click="EditUser">确 定</el-button>
         </span>
         </el-dialog>
+        <!--角色分配-->
+        <el-dialog title="分配角色" :visible.sync="ResetRolesdialogVisible">
+          <div>
+              <p>当前的用户:&nbsp;&nbsp;{{RuserInfo.username}}</p>
+              <p>当前的角色:&nbsp;&nbsp;{{RuserInfo.role_name}}</p>
+              <p>新分配的角色:&nbsp;&nbsp;
+                <el-select v-model="SelectRoles" placeholder="请选择">
+                <el-option
+                v-for="item in roleslist"
+                :key="item.id"
+                :label="item.roleName"
+                :value="item.id">
+                </el-option>
+            </el-select>  
+
+
+              </p>
+          </div>
+
+       
+         <span slot="footer" class="dialog-footer">
+            <el-button @click="ResetRolesdialogVisible = false">取 消</el-button>
+            <el-button type="primary" @click="SaveRoleInfo">确 定</el-button>
+        </span>
+        </el-dialog> 
 
        
 
@@ -150,6 +175,7 @@ export default {
             total:0,
             AdddialogVisible:false,
             EditdialogVisible:false,
+            ResetRolesdialogVisible:false,
             AddUserForm:{
                 username:'',
                 password:'',
@@ -178,7 +204,14 @@ export default {
             },
             EditUserForm:{
 
-            }
+            },
+            //需要被分配角色的用户信息
+            RuserInfo:{},
+            //所有角色列表
+            roleslist:[
+         
+            ],
+            SelectRoles: ''
 
             
 
@@ -264,14 +297,15 @@ export default {
                 if(!valid) return;
                 const {data:res}=await this.$http.put('users/'+this.EditUserForm.id,
                 {email:this.EditUserForm.email,mobile:this.EditUserForm.mobile});
-
+                console.log(res);
+                return;
                 if(res.meta.status!==200){
                     return this.$message.error('更新用户信息失败');
 
                 }
                 this.EditdialogVisible=false;
                 this.getUserlist();
-                this.$message.success('更新用户信息成功');
+
             })
             
 
@@ -303,6 +337,42 @@ export default {
             
              
          
+
+        },
+        //分配角色
+        async ResetRoles(ruinfo){
+    
+ 
+            this.RuserInfo=ruinfo;
+
+            const {data:res} =  await this.$http.get('roles')
+            if(res.meta.status!==200){
+                return;
+                this.$message.error('获取角色列表失败');
+            }
+            this.roleslist=res.data;
+           
+            
+
+            this.ResetRolesdialogVisible=true;
+
+        },
+        //提交重新选择角色后的方法
+        async SaveRoleInfo(){
+
+     
+            if(!this.SelectRoles){
+                return;
+                this.$message.error('请选择要分配的角色')
+            }
+            const {data:res}=await  this.$http.put(`users/${this.RuserInfo.id}/role`,{rid:this.SelectRoles})
+
+           if(res.meta.status!==200){
+               return this.$message.error('分配角色失败');
+            }
+
+            this.getUserlist();
+            this.ResetRolesdialogVisible=false;
 
         }
 
