@@ -189,6 +189,7 @@ export default {
         },
         //点击修改弹框出现后的查询事件
         async GetEditRoles(eid){
+       
            const {data:res}=await this.$http.get('roles/'+eid)
            if(res.meta.status!==200){
                return;
