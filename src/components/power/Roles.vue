@@ -43,8 +43,8 @@
                 <el-table-column label="角色描述" prop="roleDesc"></el-table-column>
                 <el-table-column label="操作" >
                     <template slot-scope="scope">
-                         <el-button type="primary" icon="el-icon-edit" size="small" @click="GetEditRoles(scope.row)">编辑</el-button>
-                         <el-button type="danger" icon="el-icon-delete" size="small" @click="RemoveRoles(scope.row)">删除</el-button>
+                         <el-button type="primary" icon="el-icon-edit" size="small" @click="GetEditRoles(scope.row.id)">编辑</el-button>
+                         <el-button type="danger" icon="el-icon-delete" size="small" @click="RemoveRoles(scope.row.id)">删除</el-button>
                          <el-button type="warning" icon="el-icon-setting" size="small" @click="GetRightsDialog(scope.row)">分配权限</el-button>
                     </template>
 
@@ -85,8 +85,8 @@
         </el-dialog>
         <!--分配权限-->
         <el-dialog title="分配权限" :visible.sync="SetRightsVisible" @close="SetRightsDialogClose">
-         <el-tree :data="GetrightsData" :props="rightsProps" 
-         @node-click="GetrightsData" show-checkbox default-expand-all 
+         <el-tree :data="GetrightsDatainfo" :props="rightsProps" 
+         @node-click="GetrightsDatainfo" show-checkbox default-expand-all 
          node-key="id" :default-checked-keys="Dekeys" ref="TreeRef"></el-tree>
         <span slot="footer" class="dialog-footer">
             <el-button @click="SetRightsVisible = false">取 消</el-button>
@@ -128,7 +128,7 @@ export default {
 
 
             },
-            GetrightsData:[],
+            GetrightsDatainfo:[],
             rightsProps:{
                 children:'children',
                 label:'authName'
@@ -149,20 +149,14 @@ export default {
         //获取角色列表
        async GetRolesList(){
            const {data:res} =  await this.$http.get('roles');  
-           if(res.meta.status!==200){
+            if(res.meta.status!==200){
                return;
                this.$message.error('获取角色列表失败');
-           }
-           this.roleslist=res.data;
-
-          
-           
-
-
-           
-        },
+             }
+             this.roleslist=res.data;     
+         },
         //添加角色
-        AddRoles(){
+         AddRoles(){
           
             this.$refs.RolesruleForm.validate(async volid=>{
               const {data:res}= await this.$http.post('roles',this.RolesForm);
@@ -174,11 +168,12 @@ export default {
               }
  
               this.GetRolesList();
+              this.AddrolesVisible=false;
 
             })
         
             
-        },
+         },
         //监听关闭添加弹框后的重置操作
         CloseAddForm(){
             this.$refs.RolesruleForm.resetFields();
@@ -189,7 +184,7 @@ export default {
         },
         //点击修改弹框出现后的查询事件
         async GetEditRoles(eid){
-       
+           
            const {data:res}=await this.$http.get('roles/'+eid)
            if(res.meta.status!==200){
                return;
@@ -220,25 +215,20 @@ export default {
         },
         //删除角色
         async RemoveRoles(rid){
-            const rrres=await this.$confirm('此操作将永久删除数据，确定要继续吗','提示',{
-                
+           
+            const rrres=await this.$confirm('此操作将永久删除数据，确定要继续吗','提示',{                
                 type:'warning'
-
                 }).catch(error=>error)
 
                     if(rrres!='confirm'){
-                        return this.$message.info('取消删除');
-                  
+                        return this.$message.info('取消删除');                  
                 }
                const {data:res}=await this.$http.delete('roles/'+rid);
                if(res.meta.status!==200){
                    return this.$message.error('删除失败');
                }
                this.GetRolesList();
-
-          
-
-        },
+          },
         //定义是否删除权限的方法
         async RemoveRightById(role,rightid){
             const ConfirmResult=await this.$confirm('此操作将永久删除数据，确定要继续吗','提示',{
@@ -268,20 +258,15 @@ export default {
         async GetRightsDialog(role){
           this.roleId=role.id;
           const {data:res}= await this.$http.get('rights/tree')
-          
           if(res.meta.status!==200){
               return
               this.$message.error('获取权限列表失败');
-          }
-         
-            this.GetrightsData=res.data;
+           }         
+            this.GetrightsDatainfo=res.data;
             //递归获取三级节点的id
             this.GetLeafid(role, this.Dekeys);
-
             this.SetRightsVisible=true;
-
-            
-        },
+       },
         //定义一个递归函数，用来获取所有三级权限的id并保存到Dekeys数组中
         GetLeafid(node,arr){
             //1.判断该节点是否为三级节点(如何有children属性则说明不为三级属性，取反判断)
@@ -297,7 +282,7 @@ export default {
         },
         //监听权限弹框关闭后的监听事件
         SetRightsDialogClose(){
-        this.Dekeys=[];
+         this.Dekeys=[];
 
         },
         //请求给角色重新分配权限(新增或者删除权限)
@@ -311,6 +296,7 @@ export default {
            const {data:res}=await this.$http.post(`roles/${this.roleId}/rights`,{
               rids:idStr
             });
+            console.log(res);
             if(res.meta.status!==200){
                 return
                 this.$message.error('分配权限失败')
@@ -321,7 +307,7 @@ export default {
           
            
 
-        }
+        },
 
         
     }
