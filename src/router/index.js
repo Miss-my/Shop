@@ -8,10 +8,28 @@ import Rights from '../components/power/Rights'
 import Roles from '../components/power/Roles'
 import Goods_cate from '../components/Goods/Goods_cate'
 import Cate_params from '../components/Goods/Cate_params'
+import Goods_list from '../components/Goods/Goods_list'
+import Goods_Add from '../components/Goods/Add'
+
 
 Vue.use(VueRouter)
 
+Vue.filter('dateFormat',function(originVal){
+  const dt=new Date(originVal);
 
+  const y=dt.getFullYear();
+  //padStart用0进行填充
+
+  const m=(dt.getMonth()+1+'').padStart(2,'0');
+  const d=(dt.getDate()+'').padStart(2,'0');
+
+  const hh=(dt.getHours()+'').padStart(2,'0');
+  const mm=(dt.getMinutes()+'').padStart(2,'0');
+  const ss=(dt.getSeconds()+'').padStart(2,'0');
+
+  return `${y}-${m}-${d} ${hh}:${mm}:${ss}`;
+
+})
 
 const router = new VueRouter({
   routes:[
@@ -54,6 +72,14 @@ const router = new VueRouter({
         {
           path:'/params',
           component:Cate_params,
+        },
+        {
+          path:'/goods',
+          component:Goods_list,
+        },
+        {
+          path:'/goods/add',
+          component:Goods_Add
         }
       ]
     
